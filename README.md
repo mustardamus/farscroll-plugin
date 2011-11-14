@@ -1,6 +1,6 @@
 # jQuery Farscroll Plugin
 
-Clone that scrollbar far away. [Demo](http://mustardamus.github.com/farscroll-plugin).
+Clone that scrollbar far away. [Demo](http://demos.usejquery.com/farscroll-plugin/).
 
 This simple Plugin enhances elements that have a overflowing fixed width but no fixed height,
 the ones with the horizontal scrollbar like `pre`. If the element overlaps the page fold the
