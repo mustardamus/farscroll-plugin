@@ -39,5 +39,6 @@ installed use the `thor compile:js` task.
 ## License
 
 Copyright (c) 2011 Sebstian Senf
+
 Dual licensed under the [MIT](http://www.opensource.org/licenses/mit-license.php) and
-[GPL](ttp://www.gnu.org/licenses/gpl.html) licenses.
+[GPL](http://www.gnu.org/licenses/gpl.html) licenses.
