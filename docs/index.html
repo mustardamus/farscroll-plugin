@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    
+    <title>jQuery Farscroll Plugin - Documentation</title>
+    
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/docs.css" rel="stylesheet">
+    
+    <script src="js/jquery-1.7.min.js"></script>
+    <script src="../lib/jquery.farscroll.js"></script>
+    <script src="js/demo.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="content">
+        <div class="page-header">
+          <h1>
+            jQuery Farscroll Plugin
+            <small>Clone that scrollbar far away.</small>
+          </h1>
+        </div>
+        
+        <p>
+          This simple Plugin enhances elements that have a overflowing fixed width but no fixed height, the ones with
+          the horizontal scrollbar like <code>pre</code>. If the element overlaps the page fold the scrollbar is not
+          visible. With this Plugin a cloned scrollbar is positioned over the element when needed.
+        </p>
+      
+        <h2>Installation</h2>
+        <p>
+          Include jQuery and the Plugin in your page.
+        </p>
+        <pre>&lt;script src="js/jquery-1.7.min.js"&gt;&lt;/script&gt;
+&lt;script src="../lib/jquery.farscroll.js"&gt;&lt;/script&gt;</pre>
+
+
+        <h2>Initialization</h2>
+        <p>
+          Call the <code>farscroll()</code> function on the elements you want to have the horizontal
+          scrollbar to be cloned.
+        </p>
+        <pre>$(document).ready(function() {
+  $('pre#demo').farscroll();
+});</pre>
+            
+        <h2>Options</h2>
+        <pre>$('pre#demo').farscroll({
+  height    : 18,                   //the height of the DIV containing the cloned scrollbar
+  background: 'rgba(0, 0, 0, 0.05)' //backgound color of the overlap (DIV height - scrollbar height)
+});</pre>
+
+        <h2>Compilation</h2>
+        <p>
+          This Plugin is written in <a href="http://jashkenas.github.com/coffee-script">CoffeeScript</a>.
+          Compile it to JavaScript with <code>coffee -o ./lib/ -c ./src/</code>. If you have
+          <a href="https://github.com/wycats/thor">Thor</a> installed use the
+          <code>thor compile:js</code> task.
+        </p>
+
+        <div class="row demo">
+          <div class="span12">
+            <h2>Demo</h2>
+          </div>
+        
+          <div class="span5 offset1">
+            <h3>With Plugin</h3>
+            <pre id="demo">###
+# jQuery Farscroll Plugin - v0.1.0
+#
+# http://github.com/mustardamus/farscroll-plugin
+# 
+# Copyright (c) 2011 Sebstian Senf
+# Dual licensed under the MIT and GPL licenses.
+#   http://www.opensource.org/licenses/mit-license.php
+#   http://www.gnu.org/licenses/gpl.html
+###
+
+class Farscroll
+  defaults:
+    height    : 18                    # the height of the DIV containing the cloned scrollbar
+    background: 'rgba(0, 0, 0, 0.05)' # backgound color of the overlap (DIV height - scrollbar height)
+    
+  constructor: (el, options) -&gt;
+    @options       = $.extend {}, @defaults, options
+    @winEl         = $ window
+    @el            = el
+    @elHeight      = el.height()
+    @maxScrollLeft = @maxScrollLeft()
+    
+    if @maxScrollLeft &gt; 0
+      @cloneEl = @cloneScrollbar()
+    
+      @cloneScrollEvent @el, @cloneEl
+      @cloneScrollEvent @cloneEl, @el
+      
+      @positionClone()
+      @toggleClone()
+    
+      @winEl.on 'resize', =&gt;
+        @positionClone()
+      
+      @winEl.on 'scroll', =&gt;
+        @toggleClone()
+  
+  cloneScrollbar: (maxScrollLeft) -&gt;
+    width  = @el.outerWidth()
+    clone  = $ '&lt;div/&gt;'
+      class: 'farscroll-clone'
+      html : '&lt;div/&gt;'
+      css  :
+        position  : 'fixed'
+        overflow  : 'auto'
+        display   : 'none'
+        width     : width
+        height    : @options.height
+        background: @options.background
+    
+    clone.appendTo 'body'
+    clone.children().css
+      width : width + @maxScrollLeft
+      height: 1
+    
+    clone
+  
+  cloneScrollEvent: (from, to) -&gt;
+    from.on 'scroll', -&gt;
+      to.scrollLeft from.scrollLeft()
+  
+  maxScrollLeft: -&gt;
+    @el.scrollLeft 99999
+    max = @el.scrollLeft()
+    @el.scrollLeft 0
+    max
+  
+  positionClone: -&gt;
+    @cloneEl.css
+      top : @winEl.height() - @options.height
+      left: @el.offset().left
+  
+  toggleClone: -&gt;
+    height    = @options.height
+    offsetTop = @el.offset().top + @elHeight + height
+    fold      = @winEl.height() + @winEl.scrollTop() - offsetTop
+    
+    if fold &lt; 0                       #above the fold
+      if @elHeight &lt; -fold + height
+        @cloneEl.hide()
+      else                            #overlaps the fold
+        @cloneEl.fadeIn 'fast'
+    else                              #below the fold
+      @cloneEl.hide()
+
+$.fn.farscroll = (options) -&gt;
+  for el in @
+    new Farscroll $(el), options</pre>
+          </div>
+          <div class="span5 offset2">
+            <h3>Without Plugin</h3>
+            <pre>###
+# jQuery Farscroll Plugin - v0.1.0
+#
+# http://github.com/mustardamus/farscroll-plugin
+# 
+# Copyright (c) 2011 Sebstian Senf
+# Dual licensed under the MIT and GPL licenses.
+#   http://www.opensource.org/licenses/mit-license.php
+#   http://www.gnu.org/licenses/gpl.html
+###
+
+class Farscroll
+  defaults:
+    height    : 18                    # the height of the DIV containing the cloned scrollbar
+    background: 'rgba(0, 0, 0, 0.05)' # backgound color of the overlap (DIV height - scrollbar height)
+    
+  constructor: (el, options) -&gt;
+    @options       = $.extend {}, @defaults, options
+    @winEl         = $ window
+    @el            = el
+    @elHeight      = el.height()
+    @maxScrollLeft = @maxScrollLeft()
+    
+    if @maxScrollLeft &gt; 0
+      @cloneEl = @cloneScrollbar()
+    
+      @cloneScrollEvent @el, @cloneEl
+      @cloneScrollEvent @cloneEl, @el
+      
+      @positionClone()
+      @toggleClone()
+    
+      @winEl.on 'resize', =&gt;
+        @positionClone()
+      
+      @winEl.on 'scroll', =&gt;
+        @toggleClone()
+  
+  cloneScrollbar: (maxScrollLeft) -&gt;
+    width  = @el.outerWidth()
+    clone  = $ '&lt;div/&gt;'
+      class: 'farscroll-clone'
+      html : '&lt;div/&gt;'
+      css  :
+        position  : 'fixed'
+        overflow  : 'auto'
+        display   : 'none'
+        width     : width
+        height    : @options.height
+        background: @options.background
+    
+    clone.appendTo 'body'
+    clone.children().css
+      width : width + @maxScrollLeft
+      height: 1
+    
+    clone
+  
+  cloneScrollEvent: (from, to) -&gt;
+    from.on 'scroll', -&gt;
+      to.scrollLeft from.scrollLeft()
+  
+  maxScrollLeft: -&gt;
+    @el.scrollLeft 99999
+    max = @el.scrollLeft()
+    @el.scrollLeft 0
+    max
+  
+  positionClone: -&gt;
+    @cloneEl.css
+      top : @winEl.height() - @options.height
+      left: @el.offset().left
+  
+  toggleClone: -&gt;
+    height    = @options.height
+    offsetTop = @el.offset().top + @elHeight + height
+    fold      = @winEl.height() + @winEl.scrollTop() - offsetTop
+    
+    if fold &lt; 0                       #above the fold
+      if @elHeight &lt; -fold + height
+        @cloneEl.hide()
+      else                            #overlaps the fold
+        @cloneEl.fadeIn 'fast'
+    else                              #below the fold
+      @cloneEl.hide()
+
+$.fn.farscroll = (options) -&gt;
+  for el in @
+    new Farscroll $(el), options</pre>
+          </div>
+        </div>
+      </div>
+      
+      <footer>
+        <p>
+          Copyright &copy; <a href="http://twitter.com/mustardamus">Sebastian Senf</a> 2011
+          -
+          This template is <a href="http://twitter.github.com/bootstrap">bootstrapped</a>
+        </p>
+      </footer>
+    </div>
+    
+    <a href="http://github.com/mustardamus/farscroll-plugin" id="fork">
+      <img src="https://a248.e.akamai.net/assets.github.com/img/71eeaab9d563c2b3c590319b398dd35683265e85/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub">
+    </a>
+  </body>
+</html>
